@@ -18,10 +18,10 @@ def get_records(categories):
         for r in data:
             r=r.split(', ')
             r.pop(0)
-            record={}
+            record=set()
             for i, item in enumerate(r):
-                if item!=0:
-                    record[categories[i]]=1
+                if item!='0':
+                    record.add(categories[i])
             records.append(record)
     f.close()
     return records
