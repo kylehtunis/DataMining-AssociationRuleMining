@@ -6,6 +6,7 @@ Created on Tue Dec  5 23:39:32 2017
 """
 
 import itertools
+from scipy import optimize
 
 
 class APriori:
@@ -63,7 +64,7 @@ class APriori:
                     
                     if not self.check_if_frequent(set(candidate), records):
                         continue
-                    elif not self.check_subset_frequency:
+                    elif not self.check_subset_frequency(set(candidate), prev, records):
                         continue
                     
                     candidates.append(candidate)
@@ -75,6 +76,59 @@ class APriori:
 #            print(len(candidates))
             
         self.frequentItemsets=prev
+    
+    def generate_rules(self, records):
+        self.rules=[]
+        for itemset in self.frequentItemsets:
+            rule = self.generate_rule(itemset, records)
+            if rule is not None:
+                self.rules.append(rule)
+        
+    def generate_rule(self, fis, records):
+        ruleCandidates=[]
+        #generate rules with consequent size 1
+        itemset=set(fis)
+#        print(itemset)
+        for item in itemset:
+            rule=(itemset-set([item]), set([item]))
+#            print(rule)
+            conf=self.get_confidence(rule, records)
+            if conf >= self.minconf:
+                ruleCandidates.append(rule)
+        currentRule=None
+        while len(ruleCandidates)>0:
+            bestRule=None
+            bestConf=0
+            for rule in ruleCandidates:
+                conf=self.get_confidence(rule, records)
+                if conf>bestConf:
+                    bestConf=conf
+                    bestRule=rule
+#            print('Best Rule:',bestRule)
+            currentRule=bestRule
+            if len(bestRule[0])==1:
+                break
+#            print('Current Rule:',currentRule)
+            ruleCandidates=[]
+            for item in currentRule[0]:
+                rule=(currentRule[0]-set([item]), currentRule[1]|set([item]))
+                if self.get_confidence(rule, records) >= self.minconf:
+                    ruleCandidates.append(rule)
+#            print(ruleCandidates)
+            
+#        print('Returned Rule:',currentRule)
+        return currentRule
+    
+    def get_confidence(self, rule, records):
+        antecedentCount=0
+        correctCount=0
+        for r in records:
+            rs=set(r)
+            if len(rule[0]&rs) == len(rule[0]):
+                antecedentCount+=1
+                if len(rule[1]&rs) == len(rule[1]):
+                    correctCount+=1
+        return correctCount/antecedentCount
 
     def check_if_frequent(self, itemset, records):
         count=0
@@ -84,10 +138,14 @@ class APriori:
 #        print(count)
         return count>=self.minsup
     
-    def check_subset_frequency(self, itemset, records):
+    def check_subset_frequency(self, itemset, prev, records):
         for subset in sorted(list(itertools.combinations(itemset, len(itemset)-1))):
+            print(list(subset))
+            print(prev)
             if subset not in prev:
+                print('false')
                 return False
+        print('true')
         return True
     
     def get_frequency(self, itemset, records):
@@ -96,3 +154,7 @@ class APriori:
             if len(itemset & r)==len(itemset):
                 count+=1
         return count
+    
+    def print_rules(self):
+        for rule in self.rules:
+            print(str(rule[0])+' -> '+str(rule[1]))

@@ -14,7 +14,12 @@ categories=dl.get_categories()
 records=dl.get_records(categories)
 
 ###generate rules
-ap = AP.APriori(200, .5)
+ap = AP.APriori(100, .3)
 ap.generate_frequent_itemsets(records, categories)
 print(ap.frequentItemsets)
-print([ap.get_frequency(set(s), records) for s in ap.frequentItemsets])
+#print([ap.get_frequency(set(s), records) for s in ap.frequentItemsets])
+
+ap.generate_rules(records)
+
+
+ap.print_rules()
