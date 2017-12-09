@@ -19,21 +19,21 @@ categories=dl.get_categories()
 records=dl.get_records(categories)
 
 ###generate frequent itemsets
-ap = AP.APriori(.1, .5)
+ap = AP.APriori(.3, .5)
 ap.generate_frequent_itemsets(records, categories)
 kCounts=Counter()
 for fis in ap.frequentItemsets:
     kCounts[len(fis)]+=1
-print('Frequent itemsets per K:',kCounts,'\n')
+print('Frequent itemsets per K:',dict(kCounts),'\n')
 #print(ap.frequentItemsets,'\n')
 #print([ap.get_frequency(set(s), records) for s in ap.frequentItemsets])
 
 ###generate rules
 ap.generate_rules(records)
 ap.rules=sorted(ap.rules, key=lambda x:x[4],reverse=True)
-ap.print_rules(3)
+ap.print_rules(5)
 
-print('Generated',len(ap.rules),'rules\n')
+print('\nGenerated',len(ap.rules),'rules\n')
 
 ###finish timing
 stop=time.time()

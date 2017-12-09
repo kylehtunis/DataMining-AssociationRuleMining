@@ -87,7 +87,7 @@ class APriori:
             conf=self.get_confidence(rule, records)
             lift=self.get_lift(rule, records)
             if conf>=self.minconf and lift>=1:
-                interestingness=len(rule[1])**2+len(rule[0])+conf*lift
+                interestingness=conf*lift
                 rule=(rule[0], rule[1], conf, lift, interestingness)
                 ruleCandidates.append(rule)
                 rules.append(rule)
@@ -105,7 +105,7 @@ class APriori:
                     conf=self.get_confidence(rule, records)
                     lift=self.get_lift(rule, records)
                     if conf>=self.minconf and lift>=1:
-                        interestingness=len(rule[1])**2+len(rule[0])+conf*lift
+                        interestingness=conf*lift
                         rule=(rule[0],rule[1],conf,lift,interestingness)
                         ruleCandidates.append(rule)
                         rules.append(rule)
@@ -157,10 +157,10 @@ class APriori:
         return self.get_frequency(itemset, records)/len(records)
     
     def print_rules(self, top=-1):
-        if top==-1:
+        if top==-1 or top>len(self.rules):
             top=len(self.rules)
         for rule in self.rules[:top]:
             print(str(rule[0])+' -> '+str(rule[1]))
-            print('Confidence:',rule[2])
-            print('Lift:',rule[3])
-            print('Interestingness:',rule[4])
+            print('\tConfidence:',rule[2])
+            print('\tLift:',rule[3])
+            print('\tInterestingness:',rule[4])
