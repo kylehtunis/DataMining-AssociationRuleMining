@@ -86,44 +86,64 @@ class APriori:
     def generate_rules(self, records):
         self.rules=[]
         for itemset in self.frequentItemsets:
-            rule = self.generate_rule(itemset, records)
-            if rule is not None:
+            itemsetRules = self.generate_rule(itemset, records)
+            for rule in itemsetRules:
                 self.rules.append(rule)
+#        for i,rule in enumerate(self.rules):
+#            lift=self.get_lift(rule, records)
+#            
+#            if lift < 1:
+#                print(rule)
+#                print(lift)
+#                self.rules.pop(i)
+#            else:
+#                rules=(rule[0],rule[1],rule[2],lift)
         
     def generate_rule(self, fis, records):
         ruleCandidates=[]
         #generate rules with consequent size 1
         itemset=set(fis)
 #        print(itemset)
+        rules=[]
         for item in itemset:
             rule=(itemset-set([item]), set([item]))
 #            print(rule)
             conf=self.get_confidence(rule, records)
-            if conf >= self.minconf:
+            lift=self.get_lift(rule, records)
+            if conf>=self.minconf and lift>=1:
+                rule=(rule[0], rule[1], conf, lift, conf*lift)
                 ruleCandidates.append(rule)
+                rules.append(rule)
         currentRule=None
         while len(ruleCandidates)>0:
-            bestRule=None
-            bestConf=0
-            for rule in ruleCandidates:
-                conf=self.get_confidence(rule, records)
-                if conf>bestConf:
-                    bestConf=conf
-                    bestRule=rule
-#            print('Best Rule:',bestRule)
-            currentRule=(bestRule[0],bestRule[1],bestConf)
-            if len(bestRule[0])==1:
+#            bestRule=None
+#            bestConf=0
+#            for rule in ruleCandidates:
+#                conf=self.get_confidence(rule, records)
+#                if conf>bestConf:
+#                    bestConf=conf
+#                    bestRule=rule
+##            print('Best Rule:',bestRule)
+#            currentRule=(bestRule[0],bestRule[1],bestConf)
+            if len(ruleCandidates[0][0])==1:
                 break
 #            print('Current Rule:',currentRule)
+            prev=ruleCandidates.copy()
+#            print(prev)
             ruleCandidates=[]
-            for item in currentRule[0]:
-                rule=(currentRule[0]-set([item]), currentRule[1]|set([item]))
-                if self.get_confidence(rule, records) >= self.minconf:
-                    ruleCandidates.append(rule)
+            for currentRule in prev:
+                for item in currentRule[0]:
+                    rule=(currentRule[0]-set([item]), currentRule[1]|set([item]))
+                    conf=self.get_confidence(rule, records)
+                    lift=self.get_lift(rule, records)
+                    if conf>=self.minconf and lift>=1:
+                        rule=(rule[0],rule[1],conf,lift,conf*lift)
+                        ruleCandidates.append(rule)
+                        rules.append(rule)
 #            print(ruleCandidates)
             
 #        print('Returned Rule:',currentRule)
-        return currentRule
+        return rules
     
     def get_confidence(self, rule, records):
         antecedentCount=0
@@ -162,9 +182,14 @@ class APriori:
         return count
     
     def get_lift(self, rule, records):
-        return 
+        return self.get_support(rule[0]|rule[1], records)/(self.get_support(rule[0], records)*self.get_support(rule[1], records))
+                                  
+    def get_support(self, itemset, records):
+        return self.get_frequency(itemset, records)/len(records)
     
     def print_rules(self):
         for rule in self.rules:
             print(str(rule[0])+' -> '+str(rule[1]))
             print('Confidence:',rule[2])
+            print('Lift:',rule[3])
+            print('Interestingness:',rule[4])
