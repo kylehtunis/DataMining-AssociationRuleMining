@@ -7,19 +7,34 @@ Created on Thu Nov 30 00:16:45 2017
 
 import DataLoad as dl
 import A_Priori as AP
+from collections import Counter
+import time
 
+
+###start timing
+start=time.time()
 
 ###load data and categories
 categories=dl.get_categories()
 records=dl.get_records(categories)
 
 ###generate frequent itemsets
-ap = AP.APriori(.02, .5)
+ap = AP.APriori(.1, .5)
 ap.generate_frequent_itemsets(records, categories)
+kCounts=Counter()
+for fis in ap.frequentItemsets:
+    kCounts[len(fis)]+=1
+print('Frequent itemsets per K:',kCounts,'\n')
 #print(ap.frequentItemsets,'\n')
 #print([ap.get_frequency(set(s), records) for s in ap.frequentItemsets])
 
 ###generate rules
 ap.generate_rules(records)
-ap.rules=sorted(ap.rules, key=lambda x:x[2]*x[3])
-ap.print_rules()
+ap.rules=sorted(ap.rules, key=lambda x:x[4])
+ap.print_rules(3)
+
+print('Generated',len(ap.rules),'rules\n')
+
+###finish timing
+stop=time.time()
+print('Runtime:',stop-start)

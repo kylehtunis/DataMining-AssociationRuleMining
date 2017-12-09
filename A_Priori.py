@@ -87,7 +87,8 @@ class APriori:
             conf=self.get_confidence(rule, records)
             lift=self.get_lift(rule, records)
             if conf>=self.minconf and lift>=1:
-                rule=(rule[0], rule[1], conf, lift, conf*lift)
+                interestingness=len(rule[1])**2+len(rule[0])+conf*lift
+                rule=(rule[0], rule[1], conf, lift, interestingness)
                 ruleCandidates.append(rule)
                 rules.append(rule)
         currentRule=None
@@ -104,7 +105,8 @@ class APriori:
                     conf=self.get_confidence(rule, records)
                     lift=self.get_lift(rule, records)
                     if conf>=self.minconf and lift>=1:
-                        rule=(rule[0],rule[1],conf,lift,conf*lift)
+                        interestingness=len(rule[1])**2+len(rule[0])+conf*lift
+                        rule=(rule[0],rule[1],conf,lift,interestingness)
                         ruleCandidates.append(rule)
                         rules.append(rule)
 #            print(ruleCandidates)
@@ -154,8 +156,10 @@ class APriori:
     def get_support(self, itemset, records):
         return self.get_frequency(itemset, records)/len(records)
     
-    def print_rules(self):
-        for rule in self.rules:
+    def print_rules(self, top=-1):
+        if top==-1:
+            top=len(self.rules)
+        for rule in self.rules[:top]:
             print(str(rule[0])+' -> '+str(rule[1]))
             print('Confidence:',rule[2])
             print('Lift:',rule[3])
