@@ -43,21 +43,6 @@ class APriori:
                 fis.append(c)
             prev=candidates.copy()
             candidates=[]
-#            print(prev)
-#            for i,c in enumerate(prev):
-#                if i==0:
-#                    continue
-#                if prev[i-1][:-1]==c[:-1]:
-#                    print(prev[i-1])
-#                    print(c)
-#                    candidates.append(prev[i-1])
-#                    candidates[-1].append(c[-1])
-#                    if not self.check_if_frequent(set(candidates[-1]), records):
-#                        candidates.pop()
-#                    elif not self.check_subset_frequency(set(candidates[-1]), records):
-#                        candidates.pop()
-#                    print(candidates)
-#                    print()
             i=0
             while i != len(prev)-1:
 #                print(prev[i])
@@ -89,15 +74,6 @@ class APriori:
             itemsetRules = self.generate_rule(itemset, records)
             for rule in itemsetRules:
                 self.rules.append(rule)
-#        for i,rule in enumerate(self.rules):
-#            lift=self.get_lift(rule, records)
-#            
-#            if lift < 1:
-#                print(rule)
-#                print(lift)
-#                self.rules.pop(i)
-#            else:
-#                rules=(rule[0],rule[1],rule[2],lift)
         
     def generate_rule(self, fis, records):
         ruleCandidates=[]
@@ -116,15 +92,6 @@ class APriori:
                 rules.append(rule)
         currentRule=None
         while len(ruleCandidates)>0:
-#            bestRule=None
-#            bestConf=0
-#            for rule in ruleCandidates:
-#                conf=self.get_confidence(rule, records)
-#                if conf>bestConf:
-#                    bestConf=conf
-#                    bestRule=rule
-##            print('Best Rule:',bestRule)
-#            currentRule=(bestRule[0],bestRule[1],bestConf)
             if len(ruleCandidates[0][0])==1:
                 break
 #            print('Current Rule:',currentRule)
