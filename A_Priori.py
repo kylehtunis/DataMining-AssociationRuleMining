@@ -94,8 +94,7 @@ class APriori:
         currentRule=None
         while len(ruleCandidates)>0:
             if len(ruleCandidates[0][0])==1:
-                ruleCandidates.pop(0)
-                continue
+                break
 #            print('Current Rule:',currentRule)
             prev=ruleCandidates.copy()
 #            print(prev)
