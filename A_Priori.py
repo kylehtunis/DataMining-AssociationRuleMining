@@ -54,7 +54,7 @@ class APriori:
                     
                     if not self.check_if_frequent(set(candidate), records):
                         continue
-                    elif not self.check_subset_frequency(set(candidate), prev, records):
+                    elif not self.check_subset_frequency(set(candidate), records):
                         continue
                     
                     candidates.append(candidate)
@@ -133,7 +133,7 @@ class APriori:
 #        print(count)
         return count>=self.minsup
     
-    def check_subset_frequency(self, itemset, prev, records):
+    def check_subset_frequency(self, itemset, records):
         for subset in itertools.combinations(itemset, len(itemset)-1):
 #            print(set(subset))
 #            print(prev)
