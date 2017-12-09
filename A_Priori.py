@@ -16,12 +16,15 @@ class APriori:
         self.minconf=minconf
         
     def generate_frequent_itemsets(self, records, categories):
+        fis=[]
+        self.minsup*=len(records)
         candidates1=sorted(list(categories))
         for c in sorted(list(categories)):
             count=sum(1 for r in records if c in r)
 #            print(c, count)
             if count<self.minsup:
                 candidates1.pop(candidates1.index(c))
+#        print(candidates1)
         candidates=[]
         for i,c in enumerate(candidates1):
             for c2 in candidates1[i:]:
@@ -36,6 +39,8 @@ class APriori:
         print()
         prev=[]
         while len(candidates)!=0:
+            for c in candidates:
+                fis.append(c)
             prev=candidates.copy()
             candidates=[]
 #            print(prev)
@@ -74,8 +79,9 @@ class APriori:
 #                print()
 #            print(candidates)
 #            print(len(candidates))
-            
-        self.frequentItemsets=prev
+           
+#        print(fis)
+        self.frequentItemsets=fis
     
     def generate_rules(self, records):
         self.rules=[]
@@ -105,7 +111,7 @@ class APriori:
                     bestConf=conf
                     bestRule=rule
 #            print('Best Rule:',bestRule)
-            currentRule=bestRule
+            currentRule=(bestRule[0],bestRule[1],bestConf)
             if len(bestRule[0])==1:
                 break
 #            print('Current Rule:',currentRule)
@@ -139,13 +145,13 @@ class APriori:
         return count>=self.minsup
     
     def check_subset_frequency(self, itemset, prev, records):
-        for subset in sorted(list(itertools.combinations(itemset, len(itemset)-1))):
-            print(list(subset))
-            print(prev)
-            if subset not in prev:
-                print('false')
+        for subset in itertools.combinations(itemset, len(itemset)-1):
+#            print(set(subset))
+#            print(prev)
+            if not self.check_if_frequent(set(subset), records):
+#                print('false')
                 return False
-        print('true')
+#        print('true')
         return True
     
     def get_frequency(self, itemset, records):
@@ -155,6 +161,10 @@ class APriori:
                 count+=1
         return count
     
+    def get_lift(self, rule, records):
+        return 
+    
     def print_rules(self):
         for rule in self.rules:
             print(str(rule[0])+' -> '+str(rule[1]))
+            print('Confidence:',rule[2])
