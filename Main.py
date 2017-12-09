@@ -30,7 +30,7 @@ print('Frequent itemsets per K:',kCounts,'\n')
 
 ###generate rules
 ap.generate_rules(records)
-ap.rules=sorted(ap.rules, key=lambda x:x[4])
+ap.rules=sorted(ap.rules, key=lambda x:x[4],reverse=True)
 ap.print_rules(3)
 
 print('Generated',len(ap.rules),'rules\n')
