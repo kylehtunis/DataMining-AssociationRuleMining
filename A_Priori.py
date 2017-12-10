@@ -6,7 +6,6 @@ Created on Tue Dec  5 23:39:32 2017
 """
 
 import itertools
-from scipy import optimize
 
 
 class APriori:
@@ -36,7 +35,6 @@ class APriori:
                 if count<self.minsup:
                     candidates.pop()
 #        print(candidates)
-        print()
         prev=[]
         while len(candidates)!=0:
             for c in candidates:
@@ -69,11 +67,16 @@ class APriori:
         self.frequentItemsets=fis
     
     def generate_rules(self, records):
-        self.rules=[]
+        candidateRules=[]
         for itemset in self.frequentItemsets:
             itemsetRules = self.generate_rule(itemset, records)
             for rule in itemsetRules:
+                candidateRules.append(rule)
+        self.rules=[]
+        for rule in candidateRules:
+            if rule[3]>=1:
                 self.rules.append(rule)
+        
         
     def generate_rule(self, fis, records):
         ruleCandidates=[]
@@ -86,11 +89,12 @@ class APriori:
 #            print(rule)
             conf=self.get_confidence(rule, records)
             lift=self.get_lift(rule, records)
-            if conf>=self.minconf and lift>=1:
-                interestingness=conf*lift
+            if conf>=self.minconf:
+                interestingness=conf*lift*len(rule[1])
                 rule=(rule[0], rule[1], conf, lift, interestingness)
-                ruleCandidates.append(rule)
-                rules.append(rule)
+                if rule not in rules:
+                    ruleCandidates.append(rule)
+                    rules.append(rule)
         currentRule=None
         while len(ruleCandidates)>0:
             if len(ruleCandidates[0][0])==1:
@@ -104,11 +108,12 @@ class APriori:
                     rule=(currentRule[0]-set([item]), currentRule[1]|set([item]))
                     conf=self.get_confidence(rule, records)
                     lift=self.get_lift(rule, records)
-                    if conf>=self.minconf and lift>=1:
-                        interestingness=conf*lift
+                    if conf>=self.minconf:
+                        interestingness=conf*lift*len(rule[1])
                         rule=(rule[0],rule[1],conf,lift,interestingness)
-                        ruleCandidates.append(rule)
-                        rules.append(rule)
+                        if rule not in rules:
+                            ruleCandidates.append(rule)
+                            rules.append(rule)
 #            print(ruleCandidates)
             
 #        print('Returned Rule:',currentRule)
